@@ -30,9 +30,18 @@ _start:
     mov ecx, LOWER(multiboot_info)
     mov [ecx], ebx
 
+    ; Enable SSE
+    mov eax, cr0
+    and ax, 0xfffb
+    or ax, 1 << 1
+    mov cr0, eax
+
+    mov eax, cr4
+    or ax, 3 << 9
+    mov cr4, eax
+
     ; Set up a page directory using 2MiB pages
     ; Add more pages until we have fully mapped the kernel image
-
     mov eax, 0
     mov ebx, LOWER(pml2)
 
