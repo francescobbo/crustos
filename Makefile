@@ -4,7 +4,7 @@ all: $(ISO)
 
 $(ISO):
 	cargo build
-	rm iso/boot/crustos
+	rm -f iso/boot/crustos
 	mv target/x86_64-crustos/debug/crustos iso/boot
 	grub-mkrescue -o $(ISO) iso
 
