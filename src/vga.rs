@@ -33,7 +33,7 @@ impl ColorCode {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
 struct ScreenChar {
-    ascii_character: u8,
+    character: u8,
     color_code: ColorCode,
 }
 
@@ -66,7 +66,7 @@ impl Writer {
                 let color_code = self.color_code;
                 unsafe {
                     core::ptr::write_volatile(&mut self.buffer.chars[row][col], ScreenChar {
-                        ascii_character: byte,
+                        character: byte,
                         color_code,
                     });
                 }
@@ -90,7 +90,7 @@ impl Writer {
 
     fn clear_row(&mut self, row: usize) {
         let blank = ScreenChar {
-            ascii_character: b' ',
+            character: b' ',
             color_code: self.color_code,
         };
         for col in 0..BUFFER_WIDTH {
@@ -149,4 +149,14 @@ macro_rules! println {
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
     WRITER.lock().write_fmt(args).unwrap();
+}
+
+#[test_case]
+fn test_println_output() {
+    let s = "Some test string that fits on a single line";
+    println!("{}", s);
+    for (i, c) in s.chars().enumerate() {
+        let screen_char = unsafe { core::ptr::read_volatile(&WRITER.lock().buffer.chars[BUFFER_HEIGHT - 2][i]) };
+        assert_eq!(char::from(screen_char.character), c);
+    }
 }
