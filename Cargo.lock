@@ -21,6 +21,7 @@ dependencies = [
  "bitflags",
  "lazy_static",
  "spin 0.9.3",
+ "x64",
 ]
 
 [[package]]
@@ -62,3 +63,7 @@ checksum = "c530c2b0d0bf8b69304b39fe2001993e267461948b890cd037d8ad4293fa1a0d"
 dependencies = [
  "lock_api",
 ]
+
+[[package]]
+name = "x64"
+version = "0.1.0"
