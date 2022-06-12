@@ -1,3 +1,4 @@
+use core::arch::asm;
 use core::marker::PhantomData;
 
 pub struct Port<T> {
@@ -6,7 +7,7 @@ pub struct Port<T> {
 }
 
 impl<T> Port<T> {
-    #[inline]
+    #[inline(always)]
     pub const fn new(port: u16) -> Port<T> {
         Port {
             port: port,
@@ -16,42 +17,42 @@ impl<T> Port<T> {
 }
 
 impl Port<u8> {
-    #[inline]
+    #[inline(always)]
     pub unsafe fn read(&self) -> u8 {
         let value: u8;
         asm!("in al, dx", out("al") value, in("dx") self.port, options(nomem, nostack, preserves_flags));
         value
     }
 
-    #[inline]
+    #[inline(always)]
     pub unsafe fn write(&self, value: u8) {
         asm!("out dx, al", in("dx") self.port, in("al") value, options(nomem, nostack, preserves_flags));
     }
 }
 
 impl Port<u16> {
-    #[inline]
+    #[inline(always)]
     pub unsafe fn read(&self) -> u16 {
         let value: u16;
         asm!("in ax, dx", out("ax") value, in("dx") self.port, options(nomem, nostack, preserves_flags));
         value
     }
 
-    #[inline]
+    #[inline(always)]
     pub unsafe fn write(&self, value: u16) {
         asm!("out dx, ax", in("dx") self.port, in("ax") value, options(nomem, nostack, preserves_flags));
     }
 }
 
 impl Port<u32> {
-    #[inline]
+    #[inline(always)]
     pub unsafe fn read(&self) -> u32 {
         let value: u32;
         asm!("in eax, dx", out("eax") value, in("dx") self.port, options(nomem, nostack, preserves_flags));
         value
     }
 
-    #[inline]
+    #[inline(always)]
     pub unsafe fn write(&self, value: u32) {
         asm!("out dx, eax", in("dx") self.port, in("eax") value, options(nomem, nostack, preserves_flags));
     }
@@ -64,21 +65,24 @@ pub struct PortRange<T> {
 }
 
 impl<T> PortRange<T> {
+    #[inline(always)]
     pub const fn new(start: u16, size: u16) -> PortRange<T> {
         PortRange { start: start, size: size, unused: PhantomData }
     }
 }
 
 impl PortRange<u8> {
+    #[inline(always)]
     pub unsafe fn read(&self, index: u16) -> u8 {
-        assert!(index < self.size);
+        debug_assert!(index < self.size);
 
         let port: Port<u8> = Port::new(self.start + index);
         port.read()
     }
 
+    #[inline(always)]
     pub unsafe fn write(&self, index: u16, value: u8) {
-        assert!(index < self.size);
+        debug_assert!(index < self.size);
 
         let port: Port<u8> = Port::new(self.start + index);
         port.write(value)
@@ -86,15 +90,17 @@ impl PortRange<u8> {
 }
 
 impl PortRange<u16> {
+    #[inline(always)]
     pub unsafe fn read(&self, index: u16) -> u16 {
-        assert!(index < self.size);
+        debug_assert!(index < self.size);
 
         let port: Port<u16> = Port::new(self.start + index);
         port.read()
     }
 
+    #[inline(always)]
     pub unsafe fn write(&self, index: u16, value: u16) {
-        assert!(index < self.size);
+        debug_assert!(index < self.size);
 
         let port: Port<u16> = Port::new(self.start + index);
         port.write(value)
@@ -102,15 +108,17 @@ impl PortRange<u16> {
 }
 
 impl PortRange<u32> {
+    #[inline(always)]
     pub unsafe fn read(&self, index: u16) -> u32 {
-        assert!(index < self.size);
+        debug_assert!(index < self.size);
 
         let port: Port<u32> = Port::new(self.start + index);
         port.read()
     }
 
+    #[inline(always)]
     pub unsafe fn write(&self, index: u16, value: u32) {
-        assert!(index < self.size);
+        debug_assert!(index < self.size);
 
         let port: Port<u32> = Port::new(self.start + index);
         port.write(value)

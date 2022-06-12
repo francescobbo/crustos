@@ -1,19 +1,26 @@
 #![no_std]
 #![no_main]
 #![feature(custom_test_frameworks)]
-#![feature(asm)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
+use core::arch::asm;
+
+use x64::pic::PIC;
+mod arch;
 mod multiboot;
 mod vga;
 mod serial;
-mod uart_16550;
 
 #[no_mangle]
 pub extern "C" fn main() -> ! {
     println!("some numbers: {} {}", 42, 1.337);
+
+    unsafe {
+        PIC::init(32);
+    }
+    PIC::disable();
 
     #[cfg(test)]
     test_main();
